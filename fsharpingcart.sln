@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.28010.2026
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "fsharpingcart", "fsharpingcart\fsharpingcart.fsproj", "{3E4C3DAC-AF6C-45CE-B694-1AFCC2A2CB4C}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{3E4C3DAC-AF6C-45CE-B694-1AFCC2A2CB4C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3E4C3DAC-AF6C-45CE-B694-1AFCC2A2CB4C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3E4C3DAC-AF6C-45CE-B694-1AFCC2A2CB4C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3E4C3DAC-AF6C-45CE-B694-1AFCC2A2CB4C}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {F47AA271-E6E0-4B08-9B34-0386B77414C9}
+	EndGlobalSection
+EndGlobal
