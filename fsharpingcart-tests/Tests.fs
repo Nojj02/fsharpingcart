@@ -27,10 +27,20 @@ type Item =
       DiscountState : ItemDiscount
       Type : ItemType }
 
+let computeDiscountedCost (item : Item) =
+    match item.DiscountState with
+    | OnSpecial discount ->
+        let discountedAmount =
+            match discount with
+            | FixedAmount fixedAmount -> fixedAmount.Amount
+            | Percent percent -> item.Cost - (decimal (percent.PercentOff) * item.Cost)
+        item.Cost - discountedAmount
+    | NoDiscount -> item.Cost
+
 type ShoppingItem =
     { ItemCode : ItemCode
       Quantity : double }
-      3
+
 type CouponCode = string
 
 type Coupon =
@@ -44,7 +54,7 @@ let compute (shop : Shop) (shoppingItems : ShoppingItem list) =
     shoppingItems
     |> List.map (fun shoppingItem ->
         let matchingItem = shop.Items |> List.find (fun item -> item.Code = shoppingItem.ItemCode)
-        decimal (shoppingItem.Quantity) * matchingItem.Cost)
+        decimal (shoppingItem.Quantity) * computeDiscountedCost matchingItem)
     |> List.sum
 
 [<Fact>]
@@ -104,3 +114,41 @@ let ``User enters several Shopping Items and program returns Total Cost``() =
 
     let totalCost = compute shop shoppingItems
     Assert.Equal(77.0m, totalCost)
+
+[<Fact>]
+let ``Items can be on special``() =
+    let generalItemType = "general"
+
+    let shop =
+        { Items =
+              [ { Code = "banana"
+                  DiscountState = ItemDiscount.OnSpecial(Discount.FixedAmount { Amount = 10.0m })
+                  Type = generalItemType
+                  Cost = 20.0m }
+                { Code = "apple"
+                  DiscountState = ItemDiscount.NoDiscount
+                  Type = generalItemType
+                  Cost = 25.0m }
+                { Code = "lettuce"
+                  DiscountState = ItemDiscount.NoDiscount
+                  Type = generalItemType
+                  Cost = 5.0m }
+                { Code = "cabbage"
+                  DiscountState = ItemDiscount.NoDiscount
+                  Type = generalItemType
+                  Cost = 6.0m }
+                { Code = "peach"
+                  DiscountState = ItemDiscount.NoDiscount
+                  Type = generalItemType
+                  Cost = 12.0m } ] }
+
+    let shoppingItems =
+        [ { ItemCode = "banana"
+            Quantity = 2.0 }
+          { ItemCode = "apple"
+            Quantity = 1.0 }
+          { ItemCode = "cabbage"
+            Quantity = 2.0 } ]
+
+    let totalCost = compute shop shoppingItems
+    Assert.Equal(57.0m, totalCost)
