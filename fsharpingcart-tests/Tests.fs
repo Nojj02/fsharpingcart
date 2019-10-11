@@ -3,41 +3,104 @@
 open System
 open Xunit
 
-type Item = {
-    Code: string;
-    Price: float
-}
+type ItemType = string
 
-type CartItem = {
-    ItemCode: string;
-    Quantity: float;
-}
+type PercentDiscount =
+    { PercentOff : double }
 
-let getByItemCode (items : Item seq) (itemCode : string) : option<Item> = 
-    items |> Seq.tryFind (fun item -> item.Code = itemCode)
+type FixedAmountDiscount =
+    { Amount : decimal }
 
-let compute (purchasedItems : CartItem seq) (items : Item seq) = 
-    purchasedItems 
-        |> Seq.map 
-            (fun purchasedItem -> 
-                match (getByItemCode items purchasedItem.ItemCode) with
-                    | Some i -> purchasedItem.Quantity * i.Price
-                    | None -> 0.0)
-        |> Seq.sum
+type Discount =
+    | Percent of PercentDiscount
+    | FixedAmount of FixedAmountDiscount
+
+type ItemDiscount =
+    | OnSpecial of Discount
+    | NoDiscount
+
+type ItemCode = string
+
+type Item =
+    { Code : ItemCode
+      Cost : decimal
+      DiscountState : ItemDiscount
+      Type : ItemType }
+
+type ShoppingItem =
+    { ItemCode : ItemCode
+      Quantity : double }
+      3
+type CouponCode = string
+
+type Coupon =
+    { Code : CouponCode
+      Discount : Discount }
+
+type Shop =
+    { Items : Item list }
+
+let compute (shop : Shop) (shoppingItems : ShoppingItem list) =
+    shoppingItems
+    |> List.map (fun shoppingItem ->
+        let matchingItem = shop.Items |> List.find (fun item -> item.Code = shoppingItem.ItemCode)
+        decimal (shoppingItem.Quantity) * matchingItem.Cost)
+    |> List.sum
 
 [<Fact>]
-let ``Zero items`` () =
-    let banana = { Code = "Banana"; Price = 12.00 };
-    let potato = { Code = "Potato"; Price = 18.00 };
-    let items = [
-        banana;
-        potato
-    ]
+let ``User enters several Shopping Items and program returns Total Cost``() =
+    let generalItemType = "general"
 
-    let purchasedItems = [
-        { ItemCode = "Banana"; Quantity = 5.0 };
-        { ItemCode = "Potato"; Quantity = 2.0 }
-    ]
+    let shop =
+        { Items =
+              [ { Code = "banana"
+                  DiscountState = ItemDiscount.NoDiscount
+                  Type = generalItemType
+                  Cost = 20.0m }
+                { Code = "apple"
+                  DiscountState = ItemDiscount.NoDiscount
+                  Type = generalItemType
+                  Cost = 25.0m }
+                { Code = "mango"
+                  DiscountState = ItemDiscount.NoDiscount
+                  Type = generalItemType
+                  Cost = 30.0m }
+                { Code = "potato"
+                  DiscountState = ItemDiscount.NoDiscount
+                  Type = generalItemType
+                  Cost = 15.0m }
+                { Code = "lettuce"
+                  DiscountState = ItemDiscount.NoDiscount
+                  Type = generalItemType
+                  Cost = 5.0m }
+                { Code = "cabbage"
+                  DiscountState = ItemDiscount.NoDiscount
+                  Type = generalItemType
+                  Cost = 6.0m }
+                { Code = "peach"
+                  DiscountState = ItemDiscount.NoDiscount
+                  Type = generalItemType
+                  Cost = 12.0m }
+                { Code = "corn"
+                  DiscountState = ItemDiscount.NoDiscount
+                  Type = generalItemType
+                  Cost = 17.0m }
+                { Code = "spinach"
+                  DiscountState = ItemDiscount.NoDiscount
+                  Type = generalItemType
+                  Cost = 22.0m }
+                { Code = "onion"
+                  DiscountState = ItemDiscount.NoDiscount
+                  Type = generalItemType
+                  Cost = 8.0m } ] }
 
-    let totalCost = compute purchasedItems items
-    Assert.Equal(96.0, totalCost)
+    let shoppingItems =
+        [ { ItemCode = "banana"
+            Quantity = 2.0 }
+          { ItemCode = "apple"
+            Quantity = 1.0 }
+          { ItemCode = "cabbage"
+            Quantity = 2.0 } ]
+
+    let totalCost = compute shop shoppingItems
+    Assert.Equal(77.0m, totalCost)
